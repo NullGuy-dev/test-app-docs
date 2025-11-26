@@ -1,0 +1,16 @@
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f6f7fb; color:#111; }
+header { background:#222; color:#fff; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
+header a { color:#fff; text-decoration:none; }
+.container { padding:20px; }
+.formcard { background:#fff; padding:20px; border-radius:8px; box-shadow:0 4px 14px rgba(0,0,0,0.06); max-width:800px; margin:20px auto; }
+.formcard label { display:block; margin-bottom:10px; }
+.formcard input[type=text], .formcard input[type=email], .formcard input[type=password], .formcard textarea, .formcard input[type=datetime-local] { width:100%; padding:8px; box-sizing:border-box; }
+.button { display:inline-block; padding:8px 12px; background:#1f72ff; color:#fff; border-radius:6px; text-decoration:none; }
+.messages { max-width:900px; margin:10px auto; }
+.msg { padding:8px 12px; border-radius:6px; margin-bottom:6px; }
+.msg.error { background:#ffd8d8; color:#600; }
+.msg.success { background:#e6ffea; color:#063; }
+.brands { list-style:none; padding:0; }
+.brands li { background:#fff; padding:12px; margin-bottom:8px; border-radius:6px; }
+table { width:100%; border-collapse:collapse; background:#fff; }
+table th, table td { padding:8px; border:1px solid #eee; text-align:left; }
