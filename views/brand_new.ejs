@@ -1,0 +1,282 @@
+<% include('layout', { body: (function(){ %>
+  <div class="formcard">
+    <button type="button" class="back-btn" onclick="window.location='/'">← Back</button>
+    <h2>Create Brand</h2>
+    <form id="brandForm" method="post" action="/brands/new">
+      <label>Name 
+        <input name="name" required/>
+      </label>
+
+      <label>Description 
+        <textarea name="description"></textarea>
+      </label>
+
+      <label>Telegram channel (id or url with @)
+        <input
+          name="telegram_channel",
+          placeholder="@yourtelegramchannel"
+        />
+      </label>
+
+      <label>Telegram languages (comma-separated) 
+        <input
+          name="telegram_languages",
+          placeholder="ru, en, ua"
+        />
+      </label>
+
+      <h3 style="margin-top: 1.5rem; color:#5f2eea;">Wordpress</h3>
+
+      <label>Wordpress credentials (JSON) 
+        <textarea name="wordpress_credentials" placeholder='{"url":"https://...","user":"...","pass":"..."}'></textarea>
+      </label>
+
+      <label>Wordpress languages (comma-separated) 
+        <input
+          name="wordpress_languages",
+          placeholder="ru, en, ua"
+        />
+      </label>
+
+      <h3 style="margin-top: 1.5rem; color:#5f2eea;">LinkedIn</h3>
+
+      <label>LinkedIn credentials (JSON) 
+        <textarea name="linkedin_credentials" placeholder='{"clientId":"...","clientSecret":"..."}'></textarea>
+      </label>
+
+      <label>LinkedIn languages (comma-separated) 
+        <input
+          name="linkedin_languages",
+          placeholder="ru, en, ua"
+        />
+      </label>
+
+      <h3 style="margin-top: 1.5rem; color:#5f2eea;">Instagram</h3>
+
+      <label>Instagram credentials (JSON)
+        <textarea 
+          name="instagram_credentials"
+          placeholder='{"app_id":"...","app_secret":"...","ig_user_id":"..."}'
+        ></textarea>
+      </label>
+      
+      <label>Instagram languages (comma-separated)
+        <input
+          name="instagram_languages"
+          placeholder="ru, en, ua"
+        />
+      </label>
+
+      <h3 style="margin-top: 1.5rem; color:#5f2eea;">Facebook</h3>
+
+      <label>Facebook credentials (JSON)
+        <textarea 
+          name="facebook_credentials"
+          placeholder='{"app_id":"...","app_secret":"...","page_id":"..."}'
+        ></textarea>
+      </label>
+      
+      <label>Facebook languages (comma-separated)
+        <input
+          name="facebook_languages"
+          placeholder="ru, en, ua"
+        />
+      </label>
+
+      <h3 style="margin-top: 1.5rem; color:#5f2eea;">Access token for Instagram or/and Facebook</h3>
+
+      <label>Global Instagram/Facebook access token
+        <input name="instagramFacebook_global_token" placeholder="EAAB..."/>
+      </label>
+
+      <h3 style="margin-top: 1.5rem; color:#5f2eea;">TikTok</h3>
+
+      <label>TikTok credentials (JSON)
+        <textarea 
+          name="tiktok_credentials" 
+          placeholder='{"client_key":"...","client_secret":"...","access_token":"..."}'
+        ></textarea>
+      </label>
+
+      <label>TikTok languages (comma-separated)
+        <input 
+          name="tiktok_languages" 
+          placeholder="ru, en, ua"
+        />
+      </label>
+      <div id="formError" style="color:red; margin-top:0.5rem;"></div>
+      <button type="button" id="submitBtn">Create</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('brandForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorDiv = document.getElementById('formError');
+    
+    submitBtn.addEventListener('click', function() {
+      errorDiv.textContent = '';
+    
+      const name = form.name.value.trim();
+      const globalToken = form.instagramFacebook_global_token.value.trim();
+    
+      const apis = [
+        {cred: form.telegram_channel.value.trim(), lang: form.telegram_languages.value.trim(), name: "Telegram"},
+        {cred: form.wordpress_credentials.value.trim(), lang: form.wordpress_languages.value.trim(), name: "Wordpress"},
+        {cred: form.linkedin_credentials.value.trim(), lang: form.linkedin_languages.value.trim(), name: "LinkedIn"},
+        {cred: form.instagram_credentials.value.trim(), lang: form.instagram_languages.value.trim(), name: "Instagram", tokenCheck: true},
+        {cred: form.facebook_credentials.value.trim(), lang: form.facebook_languages.value.trim(), name: "Facebook", tokenCheck: true},
+        {cred: form.tiktok_credentials.value.trim(), lang: form.tiktok_languages.value.trim(), name: "TikTok"}
+      ];
+
+      if(!name) {
+        errorDiv.textContent = "Brand name is required.";
+        return;
+      }
+      let hasApi = false;
+      for(const api of apis) {
+        if(api.cred) {
+          hasApi = true;
+          try { api.name !== "Telegram" ? JSON.parse(api.cred) : ""; } 
+          catch(e) {
+            errorDiv.textContent = `${api.name} credentials is not valid JSON.`;
+            return;
+          }
+          if(!api.lang) {
+            errorDiv.textContent = `${api.name} must have at least one language specified.`;
+            return;
+          }
+          if(api.tokenCheck && !globalToken) {
+            errorDiv.textContent = `${api.name} credentials require a Global Instagram/Facebook access token.`;
+            return;
+          }
+        }
+      }
+      if(!hasApi) {
+        errorDiv.textContent = "You must fill in at least one API completely.";
+        return;
+      }
+      form.submit();
+    });
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fb;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .formcard {
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 600px;
+      margin: 3rem auto;
+      animation: fadeIn 0.4s ease;
+    }
+
+    h2 {
+      text-align: center;
+      color: #5f2eea;
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 500;
+      color: #555;
+    }
+
+    input {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    input, textarea {
+      margin-top: 0.4rem;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+
+    textarea {
+      min-height: 80px;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #7b47ff;
+      box-shadow: 0 0 0 2px rgba(123, 71, 255, 0.1);
+      outline: none;
+    }
+
+    button {
+      font-family: 'Poppins', sans-serif;
+      background: #7b47ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+
+    button:hover {
+      background: #6a38e0;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .back-btn {
+      font-family: 'Poppins', sans-serif;
+      background: #7b47ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.6rem 1.2rem;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .formcard {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+<% }).call(this) }) %>

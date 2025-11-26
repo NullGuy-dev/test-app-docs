@@ -1,0 +1,709 @@
+<% include('layout', { body: (function(){ %>
+  <div class="formcard">
+    <h2>New Post for <%= brand.name %></h2>
+
+    <div class="tabs">
+      <button type="button" class="tab-btn active" data-tab="normal">Normal Post</button>
+      <% if (brand.tiktokCredentials) { %>
+        <button type="button" class="tab-btn" data-tab="tiktok">TikTok Video</button>
+      <% } %>
+      <button type="button" class="tab-btn back" onclick="window.location='/'">← Back</button>
+    </div>
+
+    <form id="postForm" method="post" action="/brands/<%= brand.id %>/posts/generate" enctype="multipart/form-data" novalidate>
+      <div class="tab-content" id="tab-normal">
+        <label>Title *
+          <input name="title" class="title-input" placeholder="Enter post title..." />
+        </label>        
+
+        <label>Body
+          <textarea name="body" placeholder="Enter article body..." ></textarea>
+        </label>
+
+        <label>Image (optional)
+          <div class="file-input-wrapper">
+            <input type="file" id="imageInput" name="image" accept="image/*" hidden />
+            <label for="imageInput" class="custom-file-button">Choose image</label>
+            <span id="imageName" class="file-name">No image chosen</span>
+          </div>
+        </label>
+        
+        <div class="schedule-at">
+          <label>Schedule at (leave empty to send now) 
+            <input name="tiktok_schedule_at" type="datetime-local" />
+          </label>
+        </div>
+
+        <fieldset>
+          <legend>Platform *</legend>
+        
+          <% if (brand.telegramChannel) { %>
+            <label class="platform-btn-container">
+              <input type="radio" name="platform" value="telegram" class="platform-radio" data-lang="telegram" />
+              <span class="platform-btn">Telegram</span>
+            </label>
+            <div class="language-options" id="languages-telegram" style="display:none;">
+              <% (brand.telegramLanguages || []).forEach(lang => { %>
+                <label class="lang-btn-container">
+                  <input type="radio" name="language" value="<%= lang %>" required />
+                  <span class="lang-btn"><%= lang %></span>
+                </label>
+              <% }); %>
+            </div>
+          <% } %>
+        
+          <% if (brand.wordpressCredentials) { %>
+            <label class="platform-btn-container">
+              <input type="radio" name="platform" value="wordpress" class="platform-radio" data-lang="wordpress" />
+              <span class="platform-btn">Wordpress</span>
+            </label>
+            <div class="language-options" id="languages-wordpress" style="display:none;">
+              <% (brand.wordpressLanguages || []).forEach(lang => { %>
+                <label class="lang-btn-container">
+                  <input type="radio" name="language" value="<%= lang %>" required />
+                  <span class="lang-btn"><%= lang %></span>
+                </label>
+              <% }); %>
+            </div>
+          <% } %>
+        
+          <% if (brand.linkedinCredentials) { %>
+            <label class="platform-btn-container">
+              <input type="radio" name="platform" value="linkedin" class="platform-radio" data-lang="linkedin" />
+              <span class="platform-btn">LinkedIn</span>
+            </label>
+            <div class="language-options" id="languages-linkedin" style="display:none;">
+              <% (brand.linkedinLanguages || []).forEach(lang => { %>
+                <label class="lang-btn-container">
+                  <input type="radio" name="language" value="<%= lang %>" required />
+                  <span class="lang-btn"><%= lang %></span>
+                </label>
+              <% }); %>
+            </div>
+          <% } %>
+
+          <% if (brand.instagramCredentials) { %>
+            <label class="platform-btn-container">
+              <input 
+                type="radio" 
+                name="platform" 
+                value="instagram" 
+                class="platform-radio" 
+                data-lang="instagram"
+              />
+              <span class="platform-btn">Instagram</span>
+            </label>
+          
+            <div class="language-options" id="languages-instagram" style="display:none;">
+              <% (brand.instagramLanguages || []).forEach(lang => { %>
+                <label class="lang-btn-container">
+                  <input type="radio" name="language" value="<%= lang %>" required />
+                  <span class="lang-btn"><%= lang %></span>
+                </label>
+              <% }) %>
+            </div>
+          <% } %>
+
+          <% if (brand.facebookCredentials) { %>
+            <label class="platform-btn-container">
+              <input 
+                type="radio" 
+                name="platform" 
+                value="facebook" 
+                class="platform-radio" 
+                data-lang="facebook"
+              />
+              <span class="platform-btn">Facebook</span>
+            </label>
+          
+            <div class="language-options" id="languages-facebook" style="display:none;">
+              <% (brand.facebookLanguages || []).forEach(lang => { %>
+                <label class="lang-btn-container">
+                  <input type="radio" name="language" value="<%= lang %>" required />
+                  <span class="lang-btn"><%= lang %></span>
+                </label>
+              <% }) %>
+            </div>
+          <% } %>
+        </fieldset>
+      </div>
+
+      <% if (brand.tiktokCredentials) { %>
+      <div class="tab-content" id="tab-tiktok" style="display:none;">
+        <label>Video description for generation **
+          <input name="tiktok_title" class="title-input" placeholder="Enter video description..." />
+        </label>
+
+        <label>TikTok Video Description **
+          <textarea name="tiktok_desc" placeholder="Enter tiktok video description..." ></textarea>
+        </label>
+
+        <label>Video (optional)
+          <div class="file-input-wrapper">
+            <input type="file" id="videoInput" name="tiktok_video" accept="video/*" hidden />
+            <label for="videoInput" class="custom-file-button">Choose video</label>
+            <span id="videoName" class="file-name">No video chosen</span>
+          </div>
+        </label>
+        
+        <div class="schedule-at">
+          <label>Schedule at (optional)
+            <input name="schedule_at" type="datetime-local" />
+          </label>
+        </div>
+
+        <fieldset>
+          <legend>Language *</legend>
+          <div class="language-grid">
+            <% (brand.tiktokLanguages || []).forEach(function(lang){ %>
+              <label class="lang-btn-container">
+                <input type="radio" name="tiktok_language" value="<%= lang %>" required />
+                <span class="lang-btn"><%= lang %></span>
+              </label>
+            <% }); %>
+          </div>
+        </fieldset>
+      </div>
+      <% } %>
+
+      <div id="formError" style="color:red; margin-top:0.5rem;"></div>
+      <button type="submit" id="generateBtn" name="generate">Generate</button>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
+    
+      tabButtons.forEach(btn => {
+        if (btn.classList.contains('back')) return;
+        btn.addEventListener('click', () => {
+          tabButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+    
+          const tab = btn.dataset.tab;
+          tabContents.forEach(tc => {
+            tc.style.display = tc.id === 'tab-' + tab ? 'block' : 'none';
+          });
+
+          document.querySelectorAll('#tab-normal input, #tab-normal textarea').forEach(el => el.value = "");
+          document.querySelectorAll('#tab-normal input[type=radio]').forEach(el => el.checked = false);
+          document.querySelectorAll('#tab-normal .language-options').forEach(el => el.style.display = "none");
+
+          document.querySelectorAll('#tab-tiktok input, #tab-tiktok textarea').forEach(el => el.value = "");
+          document.querySelectorAll('#tab-tiktok input[type=radio]').forEach(el => el.checked = false);
+
+          document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.value = "";
+          });
+
+          const imageName = document.getElementById('imageName');
+          if (imageName) imageName.textContent = "No image chosen";
+
+          const videoName = document.getElementById('videoName');
+          if (videoName) videoName.textContent = "No video chosen";
+        });
+      });
+
+      const imageInput = document.getElementById('imageInput');
+      if (imageInput) {
+        const imageName = document.getElementById('imageName');
+        imageInput.addEventListener('change', () => {
+          imageName.textContent = imageInput.files[0]?.name || "No image chosen";
+        });
+      }
+
+      const videoInput = document.getElementById('videoInput');
+      if (videoInput) {
+        const videoName = document.getElementById('videoName');
+        videoInput.addEventListener('change', () => {
+          videoName.textContent = videoInput.files[0]?.name || "No video chosen";
+        });
+      }
+
+      const platformRadios = document.querySelectorAll('.platform-radio');
+      const allLanguageBlocks = document.querySelectorAll('.language-options');
+    
+      platformRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+          allLanguageBlocks.forEach(block => {
+            block.style.display = 'none';
+            block.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+          });
+
+          const langBlock = document.getElementById('languages-' + radio.dataset.lang);
+          if (langBlock) langBlock.style.display = 'block';
+        });
+      });
+
+      const form = document.getElementById('postForm');
+      const generateBtn = document.getElementById('generateBtn');
+      const errorBox = document.getElementById('formError');
+
+      function showFieldError(input, message) {
+        clearFieldError(input);
+        const err = document.createElement("div");
+        err.className = "field-error";
+        err.style.color = "red";
+        err.style.fontSize = "13px";
+        err.style.marginTop = "4px";
+        err.textContent = message;
+        input.insertAdjacentElement("afterend", err);
+      }
+
+      function clearFieldError(input) {
+        const next = input.nextElementSibling;
+        if (next && next.classList.contains("field-error")) {
+          next.remove();
+        }
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorBox.textContent = "";
+
+        let hasError = false;
+
+        form.querySelectorAll(".field-error").forEach(e => e.remove());
+        const isTikTokTab = document.querySelector('.tab-btn.active')?.dataset.tab === "tiktok";
+        
+        if (!isTikTokTab) {
+          const title = form.querySelector('input[name="title"]');
+          const platform = form.querySelector('input[name="platform"]:checked');
+          const language = form.querySelector('input[name="language"]:checked');
+
+          if (!title.value.trim()) {
+            errorBox.textContent = "Title is required.";
+            hasError = true;
+          } else if (!platform) {
+            errorBox.textContent = "Please select a Platform.";
+            hasError = true;
+          } else if (!language) {
+            errorBox.textContent = "Please select a Language for Platform.";
+            hasError = true;
+          }
+        } else {
+          const genDesc = form.querySelector('input[name="tiktok_title"]').value.trim();
+          const tiktokDesc = form.querySelector('textarea[name="tiktok_desc"]').value.trim();
+          const tiktokLang = form.querySelector('input[name="tiktok_language"]:checked');
+
+          if (!tiktokLang) {
+            errorBox.textContent = "Please select a Language.";
+            hasError = true;
+          } else if (!tiktokDesc && !genDesc) {
+            errorBox.textContent = "Fill TikTok Video Description OR Video description for generation.";
+            hasError = true;
+          }
+        }
+
+        if (hasError) return;
+
+        generateBtn.disabled = true;
+        generateBtn.innerText = "Generating...";
+        generateBtn.classList.add("loading");
+
+        const formData = new FormData(form);
+        const brandId = "<%= brand.id %>";
+
+        const res = await fetch(`/brands/${brandId}/posts/generate`, {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+        const postId = data.postId;
+
+        const interval = setInterval(async () => {
+          const r = await fetch(`/posts/${postId}/status`);
+          const status = await r.json();
+
+          if (status.ready) {
+            clearInterval(interval);
+            window.location.href = `/posts/${postId}/preview`;
+          }
+        }, 1500);
+      });
+    });
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fb;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .formcard {
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 600px;
+      margin: 3rem auto;
+      animation: fadeIn 0.4s ease;
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #5f2eea;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 500;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    input[type="datetime-local"],
+    textarea {
+      margin-top: 0.4rem;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+
+    textarea {
+      min-height: 100px;
+    }
+
+    form label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+
+    .title-input {
+      font-family: 'Poppins', sans-serif;
+      margin-top: 0.5rem;
+      padding: 0.8rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #f9f9fc;
+    }
+
+    .title-input:focus {
+      border-color: #7b47ff;
+      box-shadow: 0 0 0 2px rgba(123, 71, 255, 0.15);
+      outline: none;
+    }
+
+    textarea {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      min-height: 120px;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      background: #f9f9fc;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    textarea:focus {
+      border-color: #7b47ff;
+      box-shadow: 0 0 0 2px rgba(123, 71, 255, 0.1);
+      outline: none;
+    }
+
+    button.loading {
+      position: relative;
+      padding-right: 40px;
+    }
+
+    button.loading::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      width: 16px;
+      height: 16px;
+      margin-top: -8px;
+      border: 2px solid #fff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .back-btn {
+      font-family: 'Poppins', sans-serif;
+      background: #7b47ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+      margin-left: 0.5rem;
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    button[type="submit"] {
+      font-size: 1.05rem;
+      font-weight: 600;
+      padding: 0.9rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(123, 71, 255, 0.2);
+      transition: transform 0.1s, background 0.2s, box-shadow 0.2s;
+    }
+
+    button[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(123, 71, 255, 0.25);
+      background: #6a38e0;
+    }
+
+    input[type="file"],
+    input[type="datetime-local"] {
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      background: #f9f9fc;
+    }
+
+    .file-input-wrapper {
+      margin-top: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .file-name {
+      font-size: 0.95rem;
+      color: #555;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .custom-file-button {
+      margin: 0;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      transition: 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #7b47ff;
+      color: #fff;
+    }
+
+    .schedule-at {
+      margin-top: 1rem;
+    }
+
+    .platform-btn, .lang-btn, .custom-file-button {
+      transition: all 0.2s;
+    }
+    .platform-btn:hover, .lang-btn:hover, .custom-file-button:hover {
+      transform: translateY(-1px);
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #7b47ff;
+      box-shadow: 0 0 0 2px rgba(123, 71, 255, 0.1);
+      outline: none;
+    }
+
+    fieldset {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
+    legend {
+      color: #5f2eea;
+      font-weight: 600;
+      padding: 0 0.5rem;
+    }
+
+    fieldset label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 400;
+      color: #444;
+      margin: 0.4rem 0;
+    }
+
+    .platform-radio { display:none; }
+    .platform-btn-container { display:inline-block; margin:0.2rem; }
+    .platform-btn {
+      padding:0.6rem 1rem;
+      background:#eee;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:500;
+      transition:0.2s;
+    }
+    .platform-btn-container input[type="radio"]:checked + .platform-btn {
+      background:#7b47ff;
+      color:white;
+    }
+
+    .language-options {
+      margin-left: 1.5rem;
+      margin-top: 0.3rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .language-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 0.4rem 1rem;
+    }
+
+    .language-grid label {
+      font-size: 0.9rem;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    button {
+      font-family: 'Poppins', sans-serif;
+      background: #7b47ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+      background: #6a38e0;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .tab-btn.back {
+      font-family: 'Poppins', sans-serif;
+      background: #7b47ff;
+      color: #fff;
+      border-color: #7b47ff;
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    .tab-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      background: #d4d4d4;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    .tab-btn.active {
+      font-family: 'Poppins', sans-serif;
+      background: #7b47ff;
+      color: #fff;
+      border-color: #7b47ff;
+    }
+
+    .lang-btn-container input[type="radio"] { display:none; }
+    .lang-btn {
+      padding:0.6rem 1rem;
+      background:#eee;
+      border-radius:8px;
+      cursor:pointer;
+      display:inline-block;
+      margin:0.2rem;
+      font-weight:500;
+    }
+    .lang-btn-container input[type="radio"]:checked + .lang-btn {
+      background:#7b47ff;
+      color:white;
+    }
+
+    .custom-file-button {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background: #7b47ff;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      margin-right: 0.5rem;
+    }
+    .custom-file-button:hover { background: #6a38e0; }
+    .file-name { font-size: 0.95rem; color:#555; }
+
+    @media (max-width: 600px) {
+      .custom-file-button, .file-name {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+    }
+  </style>
+<% }).call(this) }) %>

@@ -1,0 +1,121 @@
+<% include('layout', {user: user, messages: messages, body: (function(){ %>
+  <div class="container">
+    <a class="button" href="/brands/new">Create brand</a>
+    <h2>Brands</h2>
+
+    <% if (brands.length===0) { %>
+      <p>No brands yet.</p>
+    <% } else { %>
+      <ul class="brands">
+        <% brands.forEach(function(b){ %>
+          <li>
+            <strong><a href="/brands/<%=b.id%>"><%= b.name %></a></strong>
+            <% if (b.description) { %>
+              <div class="desc"><%= b.description %></div>
+            <% } %>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fb;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 3rem auto;
+      padding: 1.5rem 2rem;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      animation: fadeIn 0.4s ease;
+    }
+
+    h2 {
+      color: #5f2eea;
+      font-weight: 600;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .button {
+      display: inline-block;
+      background: #7b47ff;
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .button:hover {
+      background: #6a38e0;
+    }
+
+    .button:active {
+      transform: scale(0.98);
+    }
+
+    ul.brands {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    ul.brands li {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    ul.brands li:last-child {
+      border-bottom: none;
+    }
+
+    ul.brands li a {
+      color: #5f2eea;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    ul.brands li a:hover {
+      text-decoration: underline;
+    }
+
+    .desc {
+      color: #555;
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.4em;
+      max-height: 4.2em;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 1rem;
+        margin: 2rem 1rem;
+      }
+    }
+  </style>
+<% }).call(this) }) %>

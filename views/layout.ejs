@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>SMM Admin</title>
+  <link rel="stylesheet" href="/public/static/style.css"/>
+</head>
+<body>
+  <header>
+    <h1><a href="/">SMM Admin (Prisma)</a></h1>
+    <% if (user) { %>
+      <div class="nav">Hello <%= user.name || user.email %> | <a href="/logout">Logout</a></div>
+    <% } else { %>
+      <div class="nav"><a href="/login">Login</a> | <a href="/register">Register</a></div>
+    <% } %>
+  </header>
+  <main>
+    <% if (messages && Object.keys(messages).length) { %>
+      <div class="messages">
+        <% Object.keys(messages).forEach(function(k){ messages[k].forEach(function(msg){ %>
+          <div class="msg <%= k %>"><%= msg %></div>
+        <% }) }) %>
+      </div>
+    <% } %>
+    <%= body %>
+  </main>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<% include('layout', { body: (function(){ %>
+  <div class="container">
+    <a href="/brands/<%= brand.id %>/posts/new" class="button">New post</a>
+    <a href="#" class="danger-button delete-brand-btn">Delete brand</a>
+    <button type="button" class="back-btn" onclick="window.location='/'">← Back</button>
+    <h2 id="brand-name-display" class="brand-name-container">
+      <span id="brand-name-text"><%= brand.name %></span>
+      <button id="edit-brand-btn" class="edit-button" title="Edit brand name">✏️</button>
+    </h2>
+    
+    <div id="brand-name-edit-container" style="display:none;">
+      <input type="text" id="brand-name-input" value="<%= brand.name %>" class="brand-name-input" />
+      <button id="brand-name-save" class="brand-name-save">Save</button>
+    </div>
+    <% if (brand.description) { %>
+      <p><%= brand.description %></p>
+    <% } %>
+
+    <h3>Documents</h3>
+    <form method="post" action="/brands/<%= brand.id %>/documents" enctype="multipart/form-data" class="upload-form">
+      <input type="file" id="fileInput" name="document" required hidden />
+      <label for="fileInput" class="custom-file-button">Choose file</label>
+      <span id="fileName" class="file-name">No file chosen</span>
+      <button type="submit">Upload</button>
+      <button type="button" id="delete-all-docs" class="danger-button" style="margin-left: 0.5rem; background: #ff4d4f;">Clear All</button>
+    </form>
+
+    <script>
+      const input = document.getElementById('fileInput');
+      const fileName = document.getElementById('fileName');
+      input.addEventListener('change', () => {
+        fileName.textContent = input.files[0]?.name || "No file chosen";
+      });
+
+      document.getElementById('delete-all-docs').addEventListener('click', async () => {
+        if (!confirm("Delete all documents permanently?")) return;
+
+        try {
+          const res = await fetch(`/brands/<%= brand.id %>/documents/deleteAll`, { method: 'POST' });
+          if (res.ok) {
+            window.location.reload();
+          } else {
+            alert('Failed to delete documents');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Error deleting documents');
+        }
+      });
+
+      document.querySelector('.delete-brand-btn')?.addEventListener('click', function(e){
+        e.preventDefault();
+        if (confirm("Delete this brand permanently?")) {
+          fetch(`/brands/<%= brand.id %>/delete`, { method: "POST" })
+            .then(() => window.location.href = "/")
+            .catch(() => alert("Error deleting brand"));
+        }
+      });
+
+      const editBtn = document.getElementById('edit-brand-btn');
+      const nameText = document.getElementById('brand-name-text');
+      const editContainer = document.getElementById('brand-name-edit-container');
+      const nameInput = document.getElementById('brand-name-input');
+      const saveBtn = document.getElementById('brand-name-save');
+
+      editBtn.addEventListener('click', () => {
+        nameText.style.display = 'none';
+        editBtn.style.display = 'none';
+        editContainer.style.display = 'flex';
+        nameInput.focus();
+      });
+
+      saveBtn.addEventListener('click', async () => {
+        const newName = nameInput.value.trim();
+        if (!newName) return alert('Name cannot be empty');
+
+        try {
+          const res = await fetch(`/brands/<%= brand.id %>/rename`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newName })
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            nameText.textContent = newName;
+            nameText.style.display = 'inline';
+            editBtn.style.display = 'inline';
+            editContainer.style.display = 'none';
+          } else {
+            alert('Error: ' + data.error);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Failed to update brand name');
+        }
+      });
+    </script> 
+   
+    <ul class="documents-list">
+      <% docs.forEach(function(d){ %>
+        <li>
+          <a target="_blank" href="/uploads/<%= d.filename %>"><%= d.originalName %></a>
+          <span class="doc-mime"><%= d.mime %></span>
+        </li>
+      <% }) %>
+    </ul>
+
+    <h3>Posts</h3>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Title</th><th>Platforms</th><th>Schedule</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <% posts.forEach(function(p){ %>
+          <tr>
+            <td><%= p.id %></td>
+            <td><%= p.title || '(no title)' %></td>
+            <td><%= p.platform %></td>
+            <td><%= p.scheduleAt ? p.scheduleAt.toISOString() : 'send now' %></td>
+            <td><%= p.status %> <%= p.lastError ? (' - ' + p.lastError) : '' %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fb;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 1.5rem 2rem;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      animation: fadeIn 0.4s ease;
+    }
+
+    h2 {
+      color: #5f2eea;
+      font-weight: 600;
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h3 {
+      color: #5f2eea;
+      font-weight: 500;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      line-height: 1.5;
+      margin: 0.4rem 0 1rem 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .button {
+      display: inline-block;
+      background: #7b47ff;
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .button:hover {
+      background: #6a38e0;
+    }
+
+    .button:active {
+      transform: scale(0.98);
+    }
+
+    .back-btn {
+      font-family: 'Poppins', sans-serif;
+      background: #7b47ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+      margin-left: 0.5rem;
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .upload-form {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .custom-file-button {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background: #7b47ff;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .custom-file-button:hover {
+      background: #6a38e0;
+    }
+
+    .custom-file-button:active {
+      transform: scale(0.98);
+    }
+
+    .file-name {
+      font-size: 0.95rem;
+      color: #555;
+      margin-left: 0.5rem;
+      flex-grow: 1;
+    }
+
+    .upload-form button {
+      font-family: 'Poppins', sans-serif;
+      background: #7b47ff;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.5rem 2rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .upload-form button:hover {
+      background: #6a38e0;
+    }
+
+    .upload-form button:active {
+      transform: scale(0.98);
+    }
+
+    @media (max-width: 600px) {
+      .upload-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .file-name {
+        margin-left: 0;
+      }
+
+      .upload-form button {
+        width: 100%;
+      }
+    }
+
+    .documents-list {
+      list-style: disc;
+      padding-left: 1.2rem;
+    }
+
+    .documents-list li a {
+      color: #5f2eea;
+      text-decoration: none;
+    }
+
+    .documents-list li a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    table th, table td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    table th {
+      background: #f1f3f6;
+      font-weight: 500;
+      color: #333;
+    }
+
+    table tr:hover {
+      background: #f9f9f9;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 1rem;
+        margin: 1.5rem;
+      }
+
+      table th, table td {
+        font-size: 0.9rem;
+      }
+
+      .upload-form {
+        flex-direction: column;
+      }
+
+      .upload-form input[type="file"] {
+        width: 100%;
+      }
+
+      .upload-form button {
+        width: 100%;
+      }
+    }
+
+    .danger-button {
+      display: inline-block;
+      margin-left: 0.5rem;
+      background: #ff4d4f;
+      color: white;
+      padding: 0.6rem 1.1rem;
+      border-radius: 10px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .danger-button:hover { background: #e43e3f; }
+    .danger-button:active { transform: scale(0.97); }
+
+    .danger-button-small {
+      font-family: 'Poppins', sans-serif;
+      background: #ff4d4f;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      /* padding: 0.35rem 0.7rem; */
+      margin-left: 0.5rem;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .danger-button-small:hover { background: #e43e3f; }
+    .danger-button-small:active { transform: scale(0.96); }
+
+    .delete-doc-form {
+      display: inline;
+    }
+
+    .doc-mime {
+      color: #777;
+      margin-left: 0.4rem;
+    }
+
+    .brand-name-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+    }
+
+    .edit-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin-bottom: 0.4rem;
+      margin-left: 0.4rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #5f2eea;
+      transition: transform 0.1s, color 0.2s;
+    }
+
+    .edit-button:hover {
+      color: #7b47ff;
+      transform: scale(1.1);
+    }
+
+    #brand-name-edit-container {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .brand-name-input {
+      font-family: 'Poppins', sans-serif;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1.1rem;
+      width: 250px;
+      transition: border 0.2s;
+    }
+    .brand-name-input:focus {
+      outline: none;
+      border-color: #5f2eea;
+      box-shadow: 0 0 5px rgba(95, 46, 234, 0.3);
+    }
+
+    .brand-name-save {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      background: #7b47ff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 25px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .brand-name-save:hover { background: #6a38e0; transform: scale(1.05); }
+    .brand-name-save:active { transform: scale(0.98); }
+  </style>
+<% }).call(this) }) %>

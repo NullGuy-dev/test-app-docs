@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  posts        Post[]   @relation("UserPosts")
+}
+
+model Brand {
+  id                   Int       @id @default(autoincrement())
+  name                 String
+  description          String?
+  telegramChannel      String?
+  telegramLanguages    String[]
+  wordpressCredentials       Json?
+  wordpressLanguages         String[]
+  linkedinCredentials  Json?
+  linkedinLanguages    String[]
+  tiktokCredentials    Json?
+  tiktokLanguages      String[]
+  instagramCredentials Json?
+  instagramLanguages   String[]
+  facebookCredentials Json?
+  facebookLanguages   String[]
+  documents            BrandDocument[]
+  posts                Post[]
+}
+
+model InstagramFacebookToken {
+  id        Int      @id @default(autoincrement())
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("instagramFacebook_tokens")
+}
+
+model BrandDocument {
+  id           Int      @id @default(autoincrement())
+  brand        Brand    @relation(fields: [brandId], references: [id])
+  brandId      Int
+  filename     String
+  originalName String
+  mime         String?
+  uploadedAt   DateTime @default(now())
+}
+
+model Post {
+  id             Int       @id @default(autoincrement())
+  brand          Brand     @relation(fields: [brandId], references: [id])
+  brandId        Int
+  title          String?
+  body           String?
+  shortText      String?
+  longText       String?
+  caption        String?
+  hashtags       String[]  @default([])
+  imagePath      String?
+  previewImageUrl String?
+  image_base64    String?
+  userImageFile  String?
+  platform       String?
+  language       String?
+  scheduleAt     DateTime?
+  status         String    @default("draft")
+  isGenerating    Boolean   @default(true)
+  createdBy      User?     @relation("UserPosts", fields: [createdById], references: [id])
+  createdById    Int?
+  createdAt      DateTime  @default(now())
+  lastError      String?
+}
