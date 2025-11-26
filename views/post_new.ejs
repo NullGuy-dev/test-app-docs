@@ -16,7 +16,7 @@
           <input name="title" class="title-input" placeholder="Enter post title..." />
         </label>        
 
-        <label>Body
+        <label>Arcticle body
           <textarea name="body" placeholder="Enter article body..." ></textarea>
         </label>
 
@@ -45,7 +45,7 @@
             <div class="language-options" id="languages-telegram" style="display:none;">
               <% (brand.telegramLanguages || []).forEach(lang => { %>
                 <label class="lang-btn-container">
-                  <input type="radio" name="language" value="<%= lang %>" required />
+                  <input type="radio" name="language" value="<%= lang %>" />
                   <span class="lang-btn"><%= lang %></span>
                 </label>
               <% }); %>
@@ -60,7 +60,7 @@
             <div class="language-options" id="languages-wordpress" style="display:none;">
               <% (brand.wordpressLanguages || []).forEach(lang => { %>
                 <label class="lang-btn-container">
-                  <input type="radio" name="language" value="<%= lang %>" required />
+                  <input type="radio" name="language" value="<%= lang %>" />
                   <span class="lang-btn"><%= lang %></span>
                 </label>
               <% }); %>
@@ -75,7 +75,7 @@
             <div class="language-options" id="languages-linkedin" style="display:none;">
               <% (brand.linkedinLanguages || []).forEach(lang => { %>
                 <label class="lang-btn-container">
-                  <input type="radio" name="language" value="<%= lang %>" required />
+                  <input type="radio" name="language" value="<%= lang %>" />
                   <span class="lang-btn"><%= lang %></span>
                 </label>
               <% }); %>
@@ -97,7 +97,7 @@
             <div class="language-options" id="languages-instagram" style="display:none;">
               <% (brand.instagramLanguages || []).forEach(lang => { %>
                 <label class="lang-btn-container">
-                  <input type="radio" name="language" value="<%= lang %>" required />
+                  <input type="radio" name="language" value="<%= lang %>" />
                   <span class="lang-btn"><%= lang %></span>
                 </label>
               <% }) %>
@@ -119,7 +119,7 @@
             <div class="language-options" id="languages-facebook" style="display:none;">
               <% (brand.facebookLanguages || []).forEach(lang => { %>
                 <label class="lang-btn-container">
-                  <input type="radio" name="language" value="<%= lang %>" required />
+                  <input type="radio" name="language" value="<%= lang %>" />
                   <span class="lang-btn"><%= lang %></span>
                 </label>
               <% }) %>
@@ -157,7 +157,7 @@
           <div class="language-grid">
             <% (brand.tiktokLanguages || []).forEach(function(lang){ %>
               <label class="lang-btn-container">
-                <input type="radio" name="tiktok_language" value="<%= lang %>" required />
+                <input type="radio" name="tiktok_language" value="<%= lang %>" />
                 <span class="lang-btn"><%= lang %></span>
               </label>
             <% }); %>
@@ -187,16 +187,11 @@
             tc.style.display = tc.id === 'tab-' + tab ? 'block' : 'none';
           });
 
-          document.querySelectorAll('#tab-normal input, #tab-normal textarea').forEach(el => el.value = "");
-          document.querySelectorAll('#tab-normal input[type=radio]').forEach(el => el.checked = false);
-          document.querySelectorAll('#tab-normal .language-options').forEach(el => el.style.display = "none");
-
-          document.querySelectorAll('#tab-tiktok input, #tab-tiktok textarea').forEach(el => el.value = "");
-          document.querySelectorAll('#tab-tiktok input[type=radio]').forEach(el => el.checked = false);
-
-          document.querySelectorAll('input[type="file"]').forEach(input => {
-            input.value = "";
-          });
+          document.querySelectorAll('#tab-normal input:not([type=radio]):not([type=file]), #tab-normal textarea').forEach(el => el.value = "");
+          document.querySelectorAll('#tab-tiktok input:not([type=radio]):not([type=file]), #tab-tiktok textarea').forEach(el => el.value = "");
+          document.querySelectorAll('#tab-normal input[type=radio], #tab-tiktok input[type=radio]').forEach(el => el.checked = false);
+          document.querySelectorAll('.language-options').forEach(el => el.style.display = "none");
+          document.querySelectorAll('input[type="file"]').forEach(input => input.value = "");
 
           const imageName = document.getElementById('imageName');
           if (imageName) imageName.textContent = "No image chosen";
@@ -272,7 +267,8 @@
           const title = form.querySelector('input[name="title"]');
           const platform = form.querySelector('input[name="platform"]:checked');
           const language = form.querySelector('input[name="language"]:checked');
-
+          
+          console.log(platform, language);
           if (!title.value.trim()) {
             errorBox.textContent = "Title is required.";
             hasError = true;

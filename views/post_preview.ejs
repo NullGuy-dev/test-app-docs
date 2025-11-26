@@ -1,6 +1,6 @@
 <% include('layout', { body: (function(){ %>
   <div class="formcard">
-    <% if (preview.platform) { %>
+    <% if (preview.platform || platform || post.platform) { %>
       <h2><%= preview.title || post.title %></h2>
 
       <% if (platform === 'tiktok') { %>
@@ -20,8 +20,8 @@
 
       <% if (platform == "telegram" || preview.platform == "telegram") { %>
         <p><b>Main text:</b></p>
-        <pre class="post-text"><%= preview.long_text || post.long_text %></pre>
-        <% if (preview.hashtags || post.hashtags) { %>
+        <pre class="post-text"><%= preview.long_text || post.long_text || preview.body || post.body %></pre>
+        <% if (preview.hashtags|| post.hashtags) { %>
           <p><b>Hashtags:</b>
             <% 
               let hashtags = [];
@@ -52,7 +52,7 @@
       </div>
     <% } %>
 
-    <% if (!preview.platform) { %>
+    <% if (!preview.platform && !platform && !post.platform) { %>
       <a style="color: red; font-size: 1.2rem; text-align: center; cursor: pointer;" href="/"><b>ERROR: Please return to the home page and try again.</b></a>
     <% } %>
   </div>
