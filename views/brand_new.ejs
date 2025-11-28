@@ -4,11 +4,11 @@
     <h2>Create Brand</h2>
     <form id="brandForm" method="post" action="/brands/new">
       <label>Name 
-        <input name="name" required/>
+        <input name="name" placeholder="Enter brand name..." required/>
       </label>
 
       <label>Description 
-        <textarea name="description"></textarea>
+        <textarea name="description" placeholder="Enter brand description..." style="font-family: 'Poppins', sans-serif;" ></textarea>
       </label>
 
       <label>Telegram channel (id or url with @)
@@ -21,7 +21,7 @@
       <label>Telegram languages (comma-separated) 
         <input
           name="telegram_languages",
-          placeholder="ru, en, ua"
+          placeholder="ru, en"
         />
       </label>
 
@@ -34,20 +34,20 @@
       <label>Wordpress languages (comma-separated) 
         <input
           name="wordpress_languages",
-          placeholder="ru, en, ua"
+          placeholder="ru, en"
         />
       </label>
 
       <h3 style="margin-top: 1.5rem; color:#5f2eea;">LinkedIn</h3>
 
-      <label>LinkedIn credentials (JSON) 
+      <label>LinkedIn credentials (JSON)
         <textarea name="linkedin_credentials" placeholder='{"clientId":"...","clientSecret":"..."}'></textarea>
       </label>
 
-      <label>LinkedIn languages (comma-separated) 
+      <label>LinkedIn languages (comma-separated)
         <input
           name="linkedin_languages",
-          placeholder="ru, en, ua"
+          placeholder="ru, en"
         />
       </label>
 
@@ -63,7 +63,7 @@
       <label>Instagram languages (comma-separated)
         <input
           name="instagram_languages"
-          placeholder="ru, en, ua"
+          placeholder="ru, en"
         />
       </label>
 
@@ -79,7 +79,7 @@
       <label>Facebook languages (comma-separated)
         <input
           name="facebook_languages"
-          placeholder="ru, en, ua"
+          placeholder="ru, en"
         />
       </label>
 
@@ -91,17 +91,18 @@
 
       <h3 style="margin-top: 1.5rem; color:#5f2eea;">TikTok</h3>
 
-      <label>TikTok credentials (JSON)
-        <textarea 
+      <label>TikTok credentials (account's id in Buffer)
+        <input name="tiktok_credentials" placeholder="69259ac4..."/>
+        <!-- <textarea 
           name="tiktok_credentials" 
-          placeholder='{"client_key":"...","client_secret":"...","access_token":"..."}'
-        ></textarea>
+          placeholder='69259ac4...'
+        ></textarea> -->
       </label>
 
       <label>TikTok languages (comma-separated)
         <input 
           name="tiktok_languages" 
-          placeholder="ru, en, ua"
+          placeholder="ru, en"
         />
       </label>
       <div id="formError" style="color:red; margin-top:0.5rem;"></div>
@@ -137,7 +138,7 @@
       for(const api of apis) {
         if(api.cred) {
           hasApi = true;
-          try { api.name !== "Telegram" ? JSON.parse(api.cred) : ""; } 
+          try { (api.name !== "Telegram" && api.name !== "TikTok") ? JSON.parse(api.cred) : ""; } 
           catch(e) {
             errorDiv.textContent = `${api.name} credentials is not valid JSON.`;
             return;

@@ -240,7 +240,7 @@ app.post("/brands/new", ensureAuth, upload.none(), async (req, res) => {
       linkedinCredentials: data.linkedin_credentials ? JSON.parse(data.linkedin_credentials) : undefined,
       linkedinLanguages: parseLangs(data.linkedin_languages),
     
-      tiktokCredentials: data.tiktok_credentials ? JSON.parse(data.tiktok_credentials) : undefined,
+      tiktokCredentials: data.tiktok_credentials || null,
       tiktokLanguages: parseLangs(data.tiktok_languages),
 
       instagramCredentials: instagramCreds ? instagramCreds : undefined,
@@ -547,8 +547,8 @@ app.get('/posts/:id/preview', ensureAuth, async (req, res) => {
 
 
 const uploadFields = upload.fields([
-  { name: 'image', maxCount: 1 },        // Normal Post
-  { name: 'tiktok_video', maxCount: 1 }  // TikTok Video
+  { name: 'image', maxCount: 1 },
+  { name: 'tiktok_video', maxCount: 1 }
 ]);
 
 
@@ -590,28 +590,28 @@ app.post('/brands/:id/posts/generate', ensureAuth, uploadFields, async (req, res
 
     (async () => {
       try {
-        let preview = {};
+        // let preview = {};
 
-        if (platform === 'tiktok1') {
-          if (!videoFile) {
-            const resVideo = await axios.post(process.env.N8N_GENERATE_WEBHOOK_URL, {
-              title,
-              description: body,
-              language,
-              credentials: brand.tiktokCredentials || {}
-            }, { responseType: 'arraybuffer' });
+        // if (platform === 'tiktok1') {
+        //   if (!videoFile) {
+        //     const resVideo = await axios.post(process.env.N8N_GENERATE_WEBHOOK_URL, {
+        //       title,
+        //       description: body,
+        //       language,
+        //       credentials: brand.tiktokCredentials || {}
+        //     }, { responseType: 'arraybuffer' });
 
-            const videoFileName = `tiktok_${post.id}_${Date.now()}.mp4`;
-            fs.writeFileSync(path.join(UPLOAD_DIR, videoFileName), resVideo.data);
+        //     const videoFileName = `tiktok_${post.id}_${Date.now()}.mp4`;
+        //     fs.writeFileSync(path.join(UPLOAD_DIR, videoFileName), resVideo.data);
 
-            await prisma.post.update({
-              where: { id: post.id },
-              data: { videoPath: videoFileName }
-            });
-          }
-        } else {
-          await generatePostPreview(post.id);
-        }
+        //     await prisma.post.update({
+        //       where: { id: post.id },
+        //       data: { videoPath: videoFileName }
+        //     });
+        //   }
+        // } else {
+        await generatePostPreview(post.id);
+        // }
 
         await prisma.post.update({
           where: { id: post.id },
@@ -712,7 +712,7 @@ async function sendPostToN8N(postId) {
   form.append("telegram", brand.telegramChannel || "null");
   form.append("wordpress", JSON.stringify(brand.wordpressCredentials || {}));
   form.append("linkedin", JSON.stringify(brand.linkedinCredentials || {}));
-  form.append("tiktok", JSON.stringify(brand.tiktokCredentials || {}));
+  form.append("tiktok", brand.tiktokCredentials || "null");
   form.append("image_base64", post.imagePath);
 
   let igCredentials = brand.instagramCredentials ? { ...brand.instagramCredentials } : {};

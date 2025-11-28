@@ -26,7 +26,7 @@ model Brand {
   wordpressLanguages         String[]
   linkedinCredentials  Json?
   linkedinLanguages    String[]
-  tiktokCredentials    Json?
+  tiktokCredentials    String?
   tiktokLanguages      String[]
   instagramCredentials Json?
   instagramLanguages   String[]

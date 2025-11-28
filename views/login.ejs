@@ -1,6 +1,6 @@
 <% include('layout', { body: (function(){ %>
   <div class="formcard">
-    <h2>Login</h2>
+    <h2>SMM Agent - Log In</h2>
     <form method="post" action="/login">
       <label>Email 
         <input name="email" type="email" required/>
@@ -8,7 +8,7 @@
       <label>Password 
         <input name="password" type="password" required/>
       </label>
-      <button type="submit">Login</button>
+      <button type="submit">Log In</button>
     </form>
   </div>
 
@@ -60,6 +60,7 @@
     }
 
     input {
+      font-family: 'Poppins', sans-serif;
       margin-top: 0.4rem;
       padding: 0.6rem 0.8rem;
       border: 1px solid #ccc;
@@ -75,6 +76,7 @@
     }
 
     button {
+      font-family: 'Poppins', sans-serif;
       background: #7b47ff;
       color: white;
       border: none;
